@@ -55,3 +55,41 @@ def inicia_fechada(piloto, pilotos):
                 piloto["recarga_fechada"] = 4
                 return True
     return False
+
+
+def move_jogador(piloto, comando, dt):
+    acelerador = comando[0]
+    direcao = comando[1]
+    limite = VELOCIDADE_NORMAL
+    aceleracao = -11
+    if acelerador > 0:
+        aceleracao = 29
+    if acelerador < 0:
+        aceleracao = -72
+    if piloto["nitro"] > 0:
+        limite = VELOCIDADE_NITRO
+        if acelerador > 0:
+            aceleracao = 160
+    piloto["velocidade"] += aceleracao * dt
+    if piloto["velocidade"] < 0:
+        piloto["velocidade"] = 0
+    if piloto["velocidade"] > limite:
+        piloto["velocidade"] = limite
+    piloto["x"] += direcao * (0.39 + piloto["velocidade"] / 700) * dt
+
+
+def escolhe_faixa(piloto, carros):
+    melhor_faixa = piloto["alvo"]
+    maior_espaco = -1
+    for faixa in FAIXAS:
+        espaco = 300
+        for carro in carros:
+            diferenca = carro["distancia"] - piloto["distancia"]
+            if abs(carro["x"] - faixa) < 0.14 and diferenca > -8:
+                if abs(diferenca) < espaco:
+                    espaco = abs(diferenca)
+        if espaco > maior_espaco:
+            maior_espaco = espaco
+            melhor_faixa = faixa
+    return melhor_faixa
+
