@@ -5,7 +5,15 @@ from Configuracoes import PASTA, MARCAS, FAIXAS, FASES, MUSICAS, CEUS, CHAO, CAR
 
 def carrega_recursos():
     recursos = {}
-    nomes = ['titulo','carro0', "carro1", "carro2"]
+    nomes = ["titulo", "carro0", "carro1", "carro2"]
     for marca in MARCAS:
-        nomes.append (marca)
-        nomes.append (marca + '_grau')
+        nomes.append(marca)
+        nomes.append(marca + "_grau")
+    for nome in nomes:
+        caminho = os.path.join(PASTA, "imagens", nome + ".png")
+        recursos[nome] = pygame.image.load(caminho).convert_alpha()
+    arquivo_fonte = os.path.join(PASTA, "imagens", "bold.ttf")
+    recursos["pequena"] = pygame.font.Font(arquivo_fonte, 16)
+    recursos["media"] = pygame.font.Font(arquivo_fonte, 22)
+    recursos["grande"] = pygame.font.Font(arquivo_fonte, 36)
+    return recursos
