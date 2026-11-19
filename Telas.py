@@ -103,3 +103,48 @@ def desenha_visao(tela, jogo, observador, recursos, ordem):
     pygame.draw.rect(tela, (58, 62, 73), (24, 107, 170, 4))
     pygame.draw.rect(tela, observador["cor"], (24, 107, int(170 * observador["sem_bater"] / CARGA_NITRO), 4))
 
+def desenha_corrida(tela, jogo, recursos, ordem):
+    tela.fill((18, 20, 24))
+    escreve(tela, FASES[jogo["fase"]], 24, 15, recursos["media"], (255, 203, 46))
+    escreve(tela, str(max(0, int(DURACAO - jogo["tempo"]))) + " segundos", 930, 15, recursos["media"], (245, 240, 220))
+    largura = tela.get_width() // jogo["quantidade"]
+    for i in range(jogo["quantidade"]):
+        visao = tela.subsurface((i * largura, 60, largura - 2, 650))
+        desenha_visao(visao, jogo, jogo["pilotos"][i], recursos, ordem)
+    escreve(tela, "iFood: WASD / Shift esq / F     99: setas / Shift dir / Enter     P: pausa   M: som", 24, 727, recursos["pequena"], (200, 198, 184))
+    if jogo["contagem"] > 0:
+        escreve(tela, "LARGADA EM " + str(int(jogo["contagem"]) + 1), 450, 280, recursos["grande"], (255, 203, 46))
+    if jogo["pausado"]:
+        pygame.draw.rect(tela, (20, 21, 25), (420, 280, 360, 115))
+        escreve(tela, "PAUSA", 530, 295, recursos["grande"], (255, 203, 46))
+        escreve(tela, "P ou ESC para continuar", 455, 353, recursos["pequena"], (245, 240, 220))
+
+
+def desenha_menu(tela, quantidade, fase, recursos):
+    tela.fill((24, 25, 27))
+    observador = {"x": 0.5, "distancia": 0}
+    direita = tela.subsurface((520, 0, 680, 760))
+    desenha_pista(direita, observador, fase)
+    pygame.draw.polygon(tela, (24, 25, 27), [(0, 0), (705, 0), (535, 760), (0, 760)])
+    pygame.draw.line(tela, (255, 203, 46), (705, 0), (535, 760), 3)
+    tela.blit(recursos["titulo"], (55, 80))
+    pygame.draw.polygon(tela, (255, 203, 46), [(77, 352), (491, 352), (478, 420), (64, 420)])
+    escreve(tela, "JOGAR / ENTER", 88, 370, recursos["grande"], (24, 25, 27))
+    escreve(tela, str(quantidade) + " JOGADOR(ES)   [1 / 2]", 68, 480, recursos["media"], (245, 240, 220))
+    escreve(tela, "< " + FASES[fase] + " >", 68, 580, recursos["media"], (255, 203, 46))
+    escreve(tela, "Setas: pista    Enter: jogar    Esc: sair", 68, 700, recursos["pequena"], (170, 168, 155))
+    for marca, x in [("ifood", 730), ("99", 960)]:
+        imagem = pygame.transform.scale(recursos[marca], (170, 267))
+        tela.blit(imagem, (x, 420))
+
+
+def desenha_resultado(tela, ordem, recursos):
+    tela.fill((24, 25, 27))
+    escreve(tela, "RESULTADO", 70, 55, recursos["grande"], (255, 203, 46))
+    for i in range(len(ordem)):
+        piloto = ordem[i]
+        linha = str(i + 1) + ". " + piloto["nome"]
+        linha += "    " + str(int(piloto["distancia"])) + " m"
+        linha += "    Batidas: " + str(piloto["batidas"])
+        escreve(tela, linha, 90, 160 + i * 75, recursos["media"], piloto["cor"])
+    escreve(tela, "Enter: repetir    N: próxima fase    Esc: menu", 90, 630, recursos["media"], (245, 240, 220))
