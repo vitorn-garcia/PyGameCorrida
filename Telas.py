@@ -31,3 +31,24 @@ def projeta(x, distancia, observador, largura, altura):
     tela_x = centro + (x - 0.5) * largura_pista
     tela_y = altura * 0.29 + altura * 0.69 * escala
     return [tela_x, tela_y, largura_pista]
+
+def desenha_pista(tela, observador, fase):
+    largura = tela.get_width()
+    altura = tela.get_height()
+    horizonte = int(altura * 0.29)
+    tela.fill(CEUS[fase])
+    pygame.draw.rect(tela, CHAO[fase], (0, horizonte, largura, altura))
+    pontos = []
+    for x, distancia in [(0, 1200), (1, 1200), (1, 0), (0, 0)]:
+        ponto = projeta(x, observador["distancia"] + distancia, observador, largura, altura)
+        pontos.append((ponto[0], ponto[1]))
+    pygame.draw.polygon(tela, (58, 60, 67), pontos)
+    pygame.draw.lines(tela, (235, 224, 197), True, pontos, 3)
+    deslocamento = observador["distancia"] % 16
+    for i in range(24):
+        distancia = i * 16 - deslocamento
+        if distancia >= 0:
+            for x in [0.25, 0.5, 0.75]:
+                a = projeta(x, observador["distancia"] + distancia, observador, largura, altura)
+                b = projeta(x, observador["distancia"] + distancia + 6, observador, largura, altura)
+                pygame.draw.line(tela, (226, 222, 202), (a[0], a[1]), (b[0], b[1]), 2)
