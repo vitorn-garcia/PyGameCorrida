@@ -148,3 +148,30 @@ def desenha_resultado(tela, ordem, recursos):
         linha += "    Batidas: " + str(piloto["batidas"])
         escreve(tela, linha, 90, 160 + i * 75, recursos["media"], piloto["cor"])
     escreve(tela, "Enter: repetir    N: próxima fase    Esc: menu", 90, 630, recursos["media"], (245, 240, 220))
+
+def toca_musica(fase):
+    if pygame.mixer.get_init() is not None:
+        pygame.mixer.music.load(os.path.join(PASTA, "musicas", MUSICAS[fase]))
+        pygame.mixer.music.play(-1)
+
+
+def toca_chegada():
+    if pygame.mixer.get_init() is not None:
+        pygame.mixer.music.load(os.path.join(PASTA, "musicas", "chegada_original.ogg"))
+        pygame.mixer.music.play()
+
+
+def pausa_som(pausado):
+    if pygame.mixer.get_init() is not None:
+        if pausado:
+            pygame.mixer.music.pause()
+        else:
+            pygame.mixer.music.unpause()
+
+
+def muda_volume(mudo):
+    if pygame.mixer.get_init() is not None:
+        if mudo:
+            pygame.mixer.music.set_volume(0)
+        else:
+            pygame.mixer.music.set_volume(0.72)
