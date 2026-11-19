@@ -17,3 +17,17 @@ def carrega_recursos():
     recursos["media"] = pygame.font.Font(arquivo_fonte, 22)
     recursos["grande"] = pygame.font.Font(arquivo_fonte, 36)
     return recursos
+
+def escreve(tela, mensagem, x, y, fonte, cor):
+    imagem = fonte.render(str(mensagem), True, cor)
+    tela.blit(imagem, (x, y))
+
+
+def projeta(x, distancia, observador, largura, altura):
+    relativa = distancia - observador["distancia"]
+    escala = 28 / (28 + relativa)
+    largura_pista = min(largura * 1.35, 1250) * escala
+    centro = largura / 2 - (observador["x"] - 0.5) * largura_pista * 0.46
+    tela_x = centro + (x - 0.5) * largura_pista
+    tela_y = altura * 0.29 + altura * 0.69 * escala
+    return [tela_x, tela_y, largura_pista]
