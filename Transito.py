@@ -113,3 +113,26 @@ def pressiona_linha(piloto, carros, dt):
         if pede_troca(carro, destino, carros):
             piloto["espera_trafego"] = 6
 
+
+            
+def atualiza_transito(jogo, dt):
+    carros = jogo["carros"]
+    atualiza_carros(carros, dt)
+    for piloto in jogo["pilotos"]:
+        if piloto["humano"]:
+            pressiona_linha(piloto, carros, dt)
+    jogo["novo_carro"] -= dt
+    if jogo["novo_carro"] <= 0:
+        energia = energia_musica(jogo["tempo"], jogo["fase"])
+        jogo["novo_carro"] = (2.6 - 1.65 * energia) / (1 + jogo["fase"] * 0.2)
+        for i in range(jogo["quantidade"]):
+            frente = jogo["pilotos"][i]["distancia"] + random.randint(150, 200)
+            cria_carro(carros, frente, random.randint(0, 3))
+    menor_distancia = jogo["pilotos"][0]["distancia"]
+    for piloto in jogo["pilotos"]:
+        menor_distancia = min(menor_distancia, piloto["distancia"])
+    mantidos = []
+    for carro in carros:
+        if carro["distancia"] > menor_distancia - 140:
+            mantidos.append(carro)
+    jogo["carros"] = mantidos
