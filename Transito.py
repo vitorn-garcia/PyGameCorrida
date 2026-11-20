@@ -80,3 +80,32 @@ def atualiza_carros(carros, dt):
             carro["velocidade"] = (nova_distancia - carro["distancia"]) / dt * 3.6
             carro["distancia"] = nova_distancia
 
+def pressiona_linha(piloto, carros, dt):
+    linha = -1
+    for i in range(3):
+        if abs(piloto["x"] - (i + 1) * 0.25) < 0.037:
+            linha = i
+    if linha >= 0 and linha == piloto["linha"]:
+        piloto["tempo_linha"] += dt
+    else:
+        piloto["tempo_linha"] = 0
+    piloto["linha"] = linha
+    if linha < 0 or piloto["tempo_linha"] < 3.2:
+        return
+    if piloto["velocidade"] <= 95 or piloto["espera_trafego"] > 0:
+        return
+    # Cria um carro à frente para atravessar a divisória. Não há dano remoto.
+    origem = random.choice([linha, linha + 1])
+    destino = linha
+    if origem == linha:
+        destino = linha + 1
+    aproximacao = (piloto["velocidade"] - 72) / 3.6
+    distancia = piloto["distancia"] + max(68, aproximacao * 2.4 + 4)
+    carro = cria_carro(carros, distancia, origem)
+    piloto["espera_trafego"] = 0.5
+    if carro is not None:
+        carro["velocidade"] = 72
+        carro["cruzeiro"] = 72
+        if pede_troca(carro, destino, carros):
+            piloto["espera_trafego"] = 6
+
