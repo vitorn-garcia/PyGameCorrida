@@ -93,3 +93,43 @@ def escolhe_faixa(piloto, carros):
             melhor_faixa = faixa
     return melhor_faixa
 
+
+def move_bot(piloto, carros, fase, dt):
+    limite = piloto["limite_bot"] + fase * 10
+    for carro in carros:
+        diferenca = carro["distancia"] - piloto["distancia"]
+        if -3 < diferenca < 35 and abs(carro["x"] - piloto["x"]) < 0.13:
+            piloto["alvo"] = escolhe_faixa(piloto, carros)
+            if 0 < diferenca < 12:
+                limite = 75
+    if piloto["x"] < piloto["alvo"]:
+        piloto["x"] = min(piloto["alvo"], piloto["x"] + 0.45 * dt)
+    if piloto["x"] > piloto["alvo"]:
+        piloto["x"] = max(piloto["alvo"], piloto["x"] - 0.45 * dt)
+    if piloto["velocidade"] < limite:
+        piloto["velocidade"] = min(limite, piloto["velocidade"] + 26 * dt)
+    if piloto["velocidade"] > limite:
+        piloto["velocidade"] = max(limite, piloto["velocidade"] - 55 * dt)
+
+
+def atualiza_pilotos(pilotos, carros, comandos, fase, dt):
+    for i in range(len(pilotos)):
+        piloto = pilotos[i]
+        # Os contadores são tempos restantes, em segundos.
+        for campo in ["nitro", "protecao", "recarga_fechada", "espera_trafego"]:
+            piloto[campo] = max(0, piloto[campo] - dt)
+            if piloto[campo] < 0.000001:
+                piloto[campo] = 0
+        piloto["sem_bater"] = min(CARGA_NITRO, piloto["sem_bater"] + dt)
+        if CARGA_NITRO - piloto["sem_bater"] < 0.000001:
+            piloto["sem_bater"] = CARGA_NITRO
+        if piloto["humano"]:
+            move_jogador(piloto, comandos[i], dt)
+        else:
+            move_bot(piloto, carros, fase, dt)
+        if piloto["fechando"] > 0:
+            piloto["x"] += piloto["direcao_fechada"] * 0.52 * dt
+            piloto["fechando"] = max(0, piloto["fechando"] - dt)
+        piloto["x"] = max(0.04, min(0.96, piloto["x"]))
+        piloto["distancia"] += piloto["velocidade"] / 3.6 * dt
+
