@@ -2,10 +2,12 @@
 import random
 from configuracoes import FAIXAS, ENERGIAS
 
+
 def energia_musica(tempo, fase):
-    indice = int(tempo/3)
+    indice = int(tempo / 3)
     indice = min(indice, len(ENERGIAS[fase]) - 1)
     return ENERGIAS[fase][indice]
+
 
 def cria_carro(carros, distancia, faixa):
     for outro in carros:
@@ -27,13 +29,13 @@ def cria_carro(carros, distancia, faixa):
 
 
 def pede_troca(carro, destino, carros):
-    if carro['destino'] is not in None:
+    if carro["destino"] is not None:
         return False
-    esquerda = min(carro['x'], FAIXAS[destino]) - 0.11
-    direita = max(carro['x'], FAIXAS[destino]) + 0.11
+    esquerda = min(carro["x"], FAIXAS[destino]) - 0.11
+    direita = max(carro["x"], FAIXAS[destino]) + 0.11
     for outro in carros:
-        if outro not in carro:
-            ocupa_caminho = esquerda < outro['x'] < direita
+        if outro is not carro:
+            ocupa_caminho = esquerda < outro["x"] < direita
             if outro["destino"] is not None:
                 if esquerda < FAIXAS[outro["destino"]] < direita:
                     ocupa_caminho = True
@@ -43,42 +45,44 @@ def pede_troca(carro, destino, carros):
     carro["sinal"] = 0.9
     return True
 
+
 def atualiza_carros(carros, dt):
     for carro in carros:
-            carro["espera_troca"] -= dt
-            if carro["espera_troca"] <= 0 and carro["destino"] is None:
-                carro["espera_troca"] = random.randint(5, 10)
-                destino = carro["faixa"] + random.choice([-1, 1])
-                if 0 <= destino < 4:
-                    pede_troca(carro, destino, carros)
-            novo_x = carro["x"]
-            if carro["destino"] is not None:
-                carro["sinal"] = max(0, carro["sinal"] - dt)
-                if carro["sinal"] == 0:
-                    alvo = FAIXAS[carro["destino"]]
-                    if novo_x < alvo:
-                        novo_x = min(alvo, novo_x + 0.085 * dt)
-                    else:
-                        novo_x = max(alvo, novo_x - 0.085 * dt)
-                    for outro in carros:
-                        if outro is not carro:
-                            perto = abs(outro["distancia"] - carro["distancia"]) < 8
-                            sobrepoe = abs(outro["x"] - novo_x) < 0.11
-                            if perto and sobrepoe:
-                                novo_x = carro["x"]
-                carro["x"] = novo_x
-                if abs(carro["x"] - FAIXAS[carro["destino"]]) < 0.001:
-                    carro["faixa"] = carro["destino"]
-                    carro["destino"] = None
-            carro["velocidade"] = min(carro["cruzeiro"], carro["velocidade"] + 12 * dt)
-            nova_distancia = carro["distancia"] + carro["velocidade"] / 3.6 * dt
-            for outro in carros:
-                if outro is not carro and outro["distancia"] > carro["distancia"]:
-                    if abs(outro["x"] - carro["x"]) < 0.112:
-                        limite = max(carro["distancia"], outro["distancia"] - 7.4)
-                        nova_distancia = min(nova_distancia, limite)
-            carro["velocidade"] = (nova_distancia - carro["distancia"]) / dt * 3.6
-            carro["distancia"] = nova_distancia
+        carro["espera_troca"] -= dt
+        if carro["espera_troca"] <= 0 and carro["destino"] is None:
+            carro["espera_troca"] = random.randint(5, 10)
+            destino = carro["faixa"] + random.choice([-1, 1])
+            if 0 <= destino < 4:
+                pede_troca(carro, destino, carros)
+        novo_x = carro["x"]
+        if carro["destino"] is not None:
+            carro["sinal"] = max(0, carro["sinal"] - dt)
+            if carro["sinal"] == 0:
+                alvo = FAIXAS[carro["destino"]]
+                if novo_x < alvo:
+                    novo_x = min(alvo, novo_x + 0.085 * dt)
+                else:
+                    novo_x = max(alvo, novo_x - 0.085 * dt)
+                for outro in carros:
+                    if outro is not carro:
+                        perto = abs(outro["distancia"] - carro["distancia"]) < 8
+                        sobrepoe = abs(outro["x"] - novo_x) < 0.11
+                        if perto and sobrepoe:
+                            novo_x = carro["x"]
+            carro["x"] = novo_x
+            if abs(carro["x"] - FAIXAS[carro["destino"]]) < 0.001:
+                carro["faixa"] = carro["destino"]
+                carro["destino"] = None
+        carro["velocidade"] = min(carro["cruzeiro"], carro["velocidade"] + 12 * dt)
+        nova_distancia = carro["distancia"] + carro["velocidade"] / 3.6 * dt
+        for outro in carros:
+            if outro is not carro and outro["distancia"] > carro["distancia"]:
+                if abs(outro["x"] - carro["x"]) < 0.112:
+                    limite = max(carro["distancia"], outro["distancia"] - 7.4)
+                    nova_distancia = min(nova_distancia, limite)
+        carro["velocidade"] = (nova_distancia - carro["distancia"]) / dt * 3.6
+        carro["distancia"] = nova_distancia
+
 
 def pressiona_linha(piloto, carros, dt):
     linha = -1
