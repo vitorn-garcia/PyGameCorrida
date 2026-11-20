@@ -114,7 +114,7 @@ def pressiona_linha(piloto, carros, dt):
             piloto["espera_trafego"] = 6
 
 
-            
+
 def atualiza_transito(jogo, dt):
     carros = jogo["carros"]
     atualiza_carros(carros, dt)
@@ -136,3 +136,58 @@ def atualiza_transito(jogo, dt):
         if carro["distancia"] > menor_distancia - 140:
             mantidos.append(carro)
     jogo["carros"] = mantidos
+
+
+def registra_batida(piloto, fator):
+    piloto["velocidade"] *= fator
+    piloto["sem_bater"] = 0
+    piloto["nitro"] = 0
+    piloto["fechando"] = 0
+    piloto["protecao"] = 1.1
+    piloto["batidas"] += 1
+
+
+def verifica_colisoes(pilotos, carros):
+    for piloto in pilotos:
+        if piloto["protecao"] == 0:
+            for carro in carros:
+                lateral = abs(piloto["x"] - carro["x"]) < 0.09
+                longitudinal = abs(piloto["distancia"] - carro["distancia"]) < 3.3
+                if lateral and longitudinal:
+                    registra_batida(piloto, 0.4)
+                    break
+    for i in range(len(pilotos)):
+        for j in range(i + 1, len(pilotos)):
+            a = pilotos[i]
+            b = pilotos[j]
+            lateral = abs(a["x"] - b["x"]) < 0.075
+            longitudinal = abs(a["distancia"] - b["distancia"]) < 2
+            if lateral and longitudinal and a["protecao"] == 0 and b["protecao"] == 0:
+                fator_a = 0.8
+                fator_b = 0.8
+                if a["fechando"] > 0:
+                    fator_a = 0.93
+                    fator_b = 0.67
+                elif b["fechando"] > 0:
+                    fator_a = 0.67
+                    fator_b = 0.93
+                direcao = 1
+                if b["x"] < a["x"]:
+                    direcao = -1
+                a["x"] = max(0.04, min(0.96, a["x"] - direcao * 0.04))
+                b["x"] = max(0.04, min(0.96, b["x"] + direcao * 0.04))
+                registra_batida(a, fator_a)
+                registra_batida(b, fator_b)
+
+def classificacao(pilotos):
+    # Seleciona o mais distante, guarda e repete. São só cinco pilotos.
+    restantes = pilotos[:]
+    ordem = []
+    while len(restantes) > 0:
+        maior = restantes[0]
+        for piloto in restantes:
+            if piloto["distancia"] > maior["distancia"]:
+                maior = piloto
+        ordem.append(maior)
+        restantes.remove(maior)
+    return ordem
