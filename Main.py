@@ -138,5 +138,5 @@ def principal():
     pygame.quit()
 
 
-if __name__ == "__main__":
+if __name__ == "__Main__":
     principal()
