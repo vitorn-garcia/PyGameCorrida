@@ -1,6 +1,6 @@
 """PARTE 2: carros, fechadas do trânsito, contato e classificação."""
 import random
-from configuracoes import FAIXAS, ENERGIAS
+from Configuracoes import FAIXAS, ENERGIAS
 
 
 def energia_musica(tempo, fase):
