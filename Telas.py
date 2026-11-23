@@ -1,4 +1,4 @@
-"""PARTE 3: desenho, perspectiva, menus, tela dividida, música e grau."""
+
 import os
 import pygame 
 from Configuracoes import PASTA, MARCAS, FAIXAS, FASES, MUSICAS, CEUS, CHAO, CARGA_NITRO, DURACAO
@@ -62,7 +62,7 @@ def desenha_visao(tela, jogo, observador, recursos, ordem):
     altura = tela.get_height()
     desenha_pista(tela, observador, jogo["fase"])
     objetos = jogo["carros"] + jogo["pilotos"]
-    # Desenhe o fundo primeiro e a frente depois: uma moto próxima cobre a distante.
+   
     objetos.sort(key=distancia_para_desenho, reverse=True)
     for objeto in objetos:
         relativa = objeto["distancia"] - observador["distancia"]
@@ -89,7 +89,7 @@ def desenha_visao(tela, jogo, observador, recursos, ordem):
                         lado = 1
                     pygame.draw.circle(tela, (255, 190, 45),
                                        (int(ponto[0] + lado * tamanho * 0.35), int(ponto[1] - tamanho * 0.24)), max(2, tamanho // 22))
-    # A posição é pela distância no mundo, não pela altura do desenho na tela.
+    
     posicao = ordem.index(observador) + 1
     pygame.draw.rect(tela, (19, 23, 31), (12, 12, 205, 104))
     escreve(tela, observador["nome"] + "   " + str(posicao) + "/5", 24, 20, recursos["media"], observador["cor"])
